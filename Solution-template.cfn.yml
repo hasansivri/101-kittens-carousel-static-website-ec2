@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: |
+  This template creates an EC2 instance to run static web site with Apache web server
+  
+Resources:
+  HasanInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-01c647eace872fc02
+      InstanceType: t2.micro
+      KeyName: secondkey
+      
+      SecurityGroups: 
+        - !Ref HasanInstanceSG
+     
+      Tags: 
+       - Key: Name 
+         Value : HasanInstance
+      UserData:
+        Fn::Base64:
+          !Sub |
+          #! /bin/bash
+          yum update -y 
+          yum install httpd -y
+          FOLDER="https://raw.githubusercontent.com/hasansivri/101-kittens-carousel-static-website-ec2/main/static-web"
+          cd /var/www/html
+          wget $FOLDER/index.html
+          wget $FOLDER/cat0.jpg
+          wget $FOLDER/cat1.jpg
+          wget $FOLDER/cat2.jpg
+          systemctl start httpd
+          systemctl enable httpd
+         
+  HasanInstanceSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allows SSH  # Required  !!!!!!!!
+      SecurityGroupIngress: #security-group-egress-cidr
+        -  IpProtocol: tcp
+           FromPort: 22
+           ToPort: 22 
+           CidrIp: 0.0.0.0/0           
+        -  IpProtocol: tcp
+           FromPort: 80
+           ToPort: 80 
+           CidrIp: 0.0.0.0/0     
+        -  IpProtocol: tcp
+           FromPort: 8081
+           ToPort: 8081 
+           CidrIp: 0.0.0.0/0     
