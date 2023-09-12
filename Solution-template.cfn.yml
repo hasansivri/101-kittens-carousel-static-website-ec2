@@ -15,9 +15,9 @@ Resources:
      
       Tags: 
        - Key: Name 
-         Value : HasanInstance
+         Value : !Sub Hasan ${AWS::StackName}
       UserData:
-        Fn::Base64:
+        Fn::Base64: 
           !Sub |
           #! /bin/bash
           yum update -y 
@@ -48,3 +48,12 @@ Resources:
            FromPort: 8081
            ToPort: 8081 
            CidrIp: 0.0.0.0/0     
+      Tags: 
+        - Key: env
+          Value: dev
+Outputs:
+  WebsiteURL:
+    Value: !Sub 
+      - http://${PublicAddress}
+      - PublicAddress: !GetAtt HasanInstance.PublicDnsName
+    Description: Kittens Carousel Application URL           
